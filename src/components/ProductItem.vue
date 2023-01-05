@@ -1,0 +1,23 @@
+<template>
+  <div>
+    <a class="catalog__pic" href="#">
+      <img :src="product.image" :alt="product.title" width="100%">
+    </a>
+
+    <h3 class="catalog__title">
+      <a href="#">
+        {{ product.title }}
+      </a>
+    </h3>
+
+    <span class="catalog__price">
+      {{ product.price }} ₽
+    </span>
+  </div>
+</template>
+
+<script>
+export default {
+  props: ['product'],
+}
+</script>
