@@ -3,12 +3,14 @@
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link" href="#" @click.prevent="goToPage('main')">
+          <router-link class="breadcrumbs__link" :to="{name: 'main'}">
             Каталог
-          </a>
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link" href="#" @click.prevent="goToPage('main')">
+          <!-- альтернативный вариант для перехода через метод компонента -->
+          <a class="breadcrumbs__link" href="#" @click.prevent="$router.push({ name: 'main' })"
+             @keyup.prevent="$router.push({ name: 'main' })">
             {{ category.title }}
           </a>
         </li>
@@ -43,24 +45,24 @@
               <ul class="colors">
                 <li class="colors__item">
                   <label class="colors__label">
-                    <input class="colors__radio sr-only"
-                    type="radio" name="color-item" value="blue" checked>
+                    <input class="colors__radio sr-only" type="radio" name="color-item" value="blue"
+                           checked>
                     <span class="colors__value" style="background-color: #73B6EA;">
                     </span>
                   </label>
                 </li>
                 <li class="colors__item">
                   <label class="colors__label">
-                    <input class="colors__radio sr-only"
-                    type="radio" name="color-item" value="yellow">
+                    <input class="colors__radio sr-only" type="radio" name="color-item"
+                           value="yellow">
                     <span class="colors__value" style="background-color: #FFBE15;">
                     </span>
                   </label>
                 </li>
                 <li class="colors__item">
                   <label class="colors__label">
-                    <input class="colors__radio sr-only"
-                    type="radio" name="color-item" value="gray">
+                    <input class="colors__radio sr-only" type="radio" name="color-item"
+                           value="gray">
                     <span class="colors__value" style="background-color: #939393;">
                     </span></label>
                 </li>
@@ -89,8 +91,8 @@
                 </li>
                 <li class="sizes__item">
                   <label class="sizes__label">
-                    <input class="sizes__radio sr-only"
-                    type="radio" name="sizes-item" value="128" checked>
+                    <input class="sizes__radio sr-only" type="radio" name="sizes-item" value="128"
+                           checked>
                     <span class="sizes__value">
                       128gb
                     </span>
@@ -108,7 +110,7 @@
                 </button>
 
                 <label>
-                <input type="text" value="1" name="count">
+                  <input type="text" value="1" name="count">
                 </label>
 
                 <button type="button" aria-label="Добавить один товар">
@@ -201,13 +203,12 @@ import goToPage from '@/helpers/goToPage';
 import numberFormat from '@/helpers/numberFormat';
 
 export default {
-  props: ['pageParams'],
   filters: {
     numberFormat,
   },
   computed: {
     product() {
-      return products.find((product) => product.id === this.pageParams.id);
+      return products.find((product) => product.id === +this.$route.params.id);
     },
     category() {
       return categories.find((category) => category.id === this.product.categoryId);
