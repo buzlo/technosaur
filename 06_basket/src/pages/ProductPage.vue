@@ -35,7 +35,8 @@
           {{ product.title }}
         </h2>
         <div class="item__form">
-          <form class="form" action="#" method="POST">
+          <form class="form" action="#" method="POST"
+            @submit.prevent="addToCart">
             <b class="item__price">
               {{ product.price | numberFormat }} ₽
             </b>
@@ -69,7 +70,7 @@
               </ul>
             </fieldset>
 
-            <fieldset class="form__block">
+            <!-- <fieldset class="form__block">
               <legend class="form__legend">Объем в ГБ:</legend>
 
               <ul class="sizes sizes--primery">
@@ -99,26 +100,11 @@
                   </label>
                 </li>
               </ul>
-            </fieldset>
+            </fieldset> -->
 
             <div class="item__row">
-              <div class="form__counter">
-                <button type="button" aria-label="Убрать один товар">
-                  <svg width="12" height="12" fill="currentColor">
-                    <use xlink:href="#icon-minus"></use>
-                  </svg>
-                </button>
 
-                <label>
-                  <input type="text" value="1" name="count">
-                </label>
-
-                <button type="button" aria-label="Добавить один товар">
-                  <svg width="12" height="12" fill="currentColor">
-                    <use xlink:href="#icon-plus"></use>
-                  </svg>
-                </button>
-              </div>
+            <BaseCounter v-model="productAmount"/>
 
               <button class="button button--primery" type="submit">
                 В корзину
@@ -201,8 +187,14 @@ import products from '@/data/products';
 import categories from '@/data/categories';
 import goToPage from '@/helpers/goToPage';
 import numberFormat from '@/helpers/numberFormat';
+import BaseCounter from '@/components/BaseCounter.vue';
 
 export default {
+  data() {
+    return {
+      productAmount: 1,
+    };
+  },
   filters: {
     numberFormat,
   },
@@ -216,6 +208,10 @@ export default {
   },
   methods: {
     goToPage,
+    addToCart() {
+      this.$store.commit('addProductToCart', { productId: this.product.id, amount: this.productAmount });
+    },
   },
+  components: { BaseCounter },
 };
 </script>
