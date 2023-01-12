@@ -8,7 +8,8 @@
     </button>
 
     <label>
-      <input type="text" v-model.number="amountModel" name="count">
+      <input type="text" :value="amount"
+        @input="$emit('count', $event.target.value)" name="count">
     </label>
 
     <button type="button" aria-label="Добавить один товар"
@@ -32,12 +33,6 @@ export default {
       if (newAmount > 0) {
         this.$emit('count', newAmount);
       }
-    },
-  },
-  computed: {
-    amountModel: {
-      get() { return this.amount; },
-      set(value) { this.$emit('count', value); },
     },
   },
 };
