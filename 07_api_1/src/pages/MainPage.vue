@@ -17,6 +17,18 @@
         :color-id.sync="filterColorId"
         />
       <section class="catalog">
+
+        <div v-if="productsLoading">
+          Загрузка товаров...
+          <BaseLoader/>
+        </div>
+
+        <div v-if="productsLoadingError">
+          <p>При загрузке произошла ошибка.</p>
+          <button @click.prevent="loadProducts">
+            Попробовать ещё раз
+          </button>
+        </div>
         <ProductList :products="products"/>
         <BasePagination
           v-model="page"
@@ -29,14 +41,17 @@
 </template>
 
 <script>
-import ProductList from '@/components/ProductList.vue';
 import BasePagination from '@/components/BasePagination.vue';
+import BaseLoader from '@/components/BaseLoader.vue';
+import ProductList from '@/components/ProductList.vue';
 import ProductFilter from '@/components/ProductFilter.vue';
 import axios from 'axios';
 import API_BASE_URL from '@/config';
 
 export default {
-  components: { ProductList, BasePagination, ProductFilter },
+  components: {
+    BasePagination, BaseLoader, ProductList, ProductFilter,
+  },
   data() {
     return {
       filterPriceFrom: 0,
@@ -48,6 +63,8 @@ export default {
       productsPerPage: 3,
 
       productsData: null,
+      productsLoading: false,
+      productsLoadingError: true,
     };
   },
   computed: {
@@ -64,6 +81,8 @@ export default {
   },
   methods: {
     loadProducts() {
+      this.productsLoading = true;
+      this.productsLoadingError = false;
       clearTimeout(this.loadProductsTimer);
       this.loadProductsTimer = setTimeout(() => {
         axios
@@ -77,8 +96,10 @@ export default {
               maxPrice: this.filterPriceTo,
             },
           })
-          .then((response) => { this.productsData = response.data; });
-      });
+          .then((response) => { this.productsData = response.data; })
+          .catch(() => { this.productsLoadingError = true; })
+          .then(() => { this.productsLoading = false; });
+      }, 2000);
     },
   },
   watch: {
