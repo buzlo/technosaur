@@ -1,6 +1,5 @@
 <template>
   <div>
-
   <main class="content container">
     <div class="content__top">
       <ul class="breadcrumbs">
@@ -24,6 +23,16 @@
       </span>
     </div>
 
+    <div v-if="$store.state.cartLoading">
+        Загрузка...
+        <BaseLoader/>
+      </div>
+    <div v-else-if="$store.state.cartLoadingError">
+      <p>При загрузке произошла ошибка.</p>
+      <button @click.prevent="loadCart()">
+        Попробовать ещё раз
+      </button>
+    </div>
     <section class="cart">
       <form class="cart__form form" action="#" method="POST">
         <div class="cart__field">
@@ -54,18 +63,17 @@
 <script>
 import CartItem from '@/components/CartItem.vue';
 import numberFormat from '@/helpers/numberFormat';
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
+import BaseLoader from '@/components/BaseLoader.vue';
 
 export default {
-  components: { CartItem },
+  components: { CartItem, BaseLoader },
   filters: { numberFormat },
   computed: {
     ...mapGetters({ cartItems: 'cartProductsDetail', totalPrice: 'cartTotalPrice' }),
-
-    // mapGetters вместо этого:
-    // cartItems() {
-    //   return this.cartProductsDetail;
-    // },
+  },
+  methods: {
+    ...mapActions(['loadCart']),
   },
 };
-</script>
+</script>s

@@ -2,7 +2,7 @@
   <main class="content container">
     <div v-if="productLoading">
       Загрузка...
-      <BaseLoader />
+      <BaseLoader/>
     </div>
     <div v-else-if="!productData">
       <p>При загрузке произошла ошибка.</p>
@@ -44,7 +44,7 @@
             {{ product.title }}
           </h2>
           <div class="item__form">
-            <form class="form" action="#" method="POST" @submit.prevent="addToCart">
+            <form class="form" action="#" @submit.prevent="addToCart">
               <b class="item__price">
                 {{ product.price | numberFormat }} ₽
               </b>
@@ -63,11 +63,14 @@
                 </ul>
               </fieldset>
               <div class="item__row">
-                <BaseCounter v-model="productAmount" />
-                <button class="button button--primery" type="submit">
+                <BaseCounter v-model="productQuantity" />
+                <button class="button button--primery"
+                type="submit" :disabled="productAddSending">
                   В корзину
                 </button>
               </div>
+              <div v-show="productAddSending">Добавляем товар в корзину...</div>
+              <div v-show="productAdded">Товар добавлен в корзину</div>
             </form>
           </div>
         </div>
@@ -142,16 +145,20 @@ import BaseCounter from '@/components/BaseCounter.vue';
 import BaseLoader from '@/components/BaseLoader.vue';
 import axios from 'axios';
 import API_BASE_URL from '@/config';
+import { mapActions } from 'vuex';
 
 export default {
   components: { BaseCounter, BaseLoader },
   data() {
     return {
-      productAmount: 1,
+      productQuantity: 1,
       productData: null,
       productLoading: false,
       productLoadingError: false,
       currentColor: null,
+
+      productAdded: false,
+      productAddSending: false,
     };
   },
   filters: {
@@ -169,9 +176,15 @@ export default {
     },
   },
   methods: {
+    ...mapActions(['addProductToCart']),
     goToPage,
     addToCart() {
-      this.$store.commit('addProductToCart', { productId: this.product.id, amount: this.productAmount });
+      this.productAddSending = true;
+      this.addProductToCart({ productId: this.product.id, quantity: this.productQuantity })
+        .then(() => {
+          this.productAddSending = false;
+          this.productAdded = true;
+        });
     },
     loadProduct() {
       this.productLoading = true;

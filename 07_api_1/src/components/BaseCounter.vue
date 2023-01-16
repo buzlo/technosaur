@@ -1,19 +1,19 @@
 <template>
   <div class="form__counter">
     <button type="button" aria-label="Убрать один товар"
-      @click="count(amount - 1)">
+      @click="count(quantity - 1)">
       <svg width="12" height="12" fill="currentColor">
         <use xlink:href="#icon-minus"></use>
       </svg>
     </button>
 
     <label>
-      <input type="text" :value="amount"
+      <input type="text" :value="quantity"
         @input="$emit('count', $event.target.value)" name="count">
     </label>
 
     <button type="button" aria-label="Добавить один товар"
-      @click="count(amount + 1)">
+      @click="count(quantity + 1)">
       <svg width="12" height="12" fill="currentColor">
         <use xlink:href="#icon-plus"></use>
       </svg>
@@ -24,14 +24,14 @@
 <script>
 export default {
   model: {
-    prop: 'amount',
+    prop: 'quantity',
     event: 'count',
   },
-  props: ['amount'],
+  props: ['quantity'],
   methods: {
-    count(newAmount) {
-      if (newAmount > 0) {
-        this.$emit('count', newAmount);
+    count(newQuantity) {
+      if (newQuantity > 0) {
+        this.$emit('count', newQuantity);
       }
     },
   },

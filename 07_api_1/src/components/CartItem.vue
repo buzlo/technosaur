@@ -15,14 +15,15 @@
         Артикул: {{ cartItem.productId }}
       </span>
 
-      <BaseCounter v-model.number="amount"/>
+      <BaseCounter v-model.number="quantity"/>
 
       <b class="product__price">
-        {{ (cartItem.amount * cartItem.product.price) | numberFormat }} ₽
+        {{ (cartItem.quantity * cartItem.product.price) | numberFormat }} ₽
       </b>
 
       <button class="product__del button-del" type="button"
-              aria-label="Удалить товар из корзины" @click.prevent="deleteItem(cartItem.productId)">
+              aria-label="Удалить товар из корзины"
+              @click.prevent="deleteItem({ productId: cartItem.productId })">
         <svg width="20" height="20" fill="currentColor">
           <use xlink:href="#icon-close"></use>
         </svg>
@@ -33,24 +34,30 @@
 <script>
 import BaseCounter from '@/components/BaseCounter.vue';
 import numberFormat from '@/helpers/numberFormat';
-import { mapMutations } from 'vuex';
+import { mapActions } from 'vuex';
 
 export default {
   components: { BaseCounter },
   props: ['cartItem'],
   filters: { numberFormat },
   computed: {
-    amount: {
+    quantity: {
       get() {
-        return this.cartItem.amount;
+        return this.cartItem.quantity;
       },
       set(value) {
-        return this.$store.commit('updateCartProductAmount', { productId: this.cartItem.productId, amount: value });
+        return this.$store.dispatch('updateCartProductQuantityData', { productId: this.cartItem.productId, quantity: value });
       },
     },
   },
   methods: {
-    ...mapMutations({ deleteItem: 'deleteCartProduct' }),
+    ...mapActions(['deleteProductFromCart']),
+    deleteItem({ productId }) {
+      // eslint-disable-next-line no-alert
+      if (window.confirm('Удалить товар из корзины?')) {
+        this.deleteProductFromCart({ productId });
+      }
+    },
   },
 };
 </script>

@@ -23,13 +23,13 @@
           <BaseLoader/>
         </div>
 
-        <div v-if="productsLoadingError">
+        <div v-else-if="productsLoadingError">
           <p>При загрузке произошла ошибка.</p>
           <button @click.prevent="loadProducts">
             Попробовать ещё раз
           </button>
         </div>
-        <ProductList :products="products"/>
+        <ProductList v-else :products="products"/>
         <BasePagination
           v-model="page"
           :count="countProducts"

@@ -4,7 +4,10 @@
       <use xlink:href="#icon-cart"></use>
     </svg>
     <span class="header__count" aria-label="Количество товаров">
-       {{ $store.state.cartProducts.length }}</span>
+       {{ $store.state.cartLoading? 'загрузка' :
+        $store.state.cartLoadingError? 'ошибка' :
+        $store.state.cartProducts.length }}
+    </span>
   </router-link>
 </template>
 
