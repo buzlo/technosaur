@@ -28,7 +28,8 @@
     </div>
 
     <section class="cart">
-      <form class="cart__form form" action="#" method="POST">
+      <form class="cart__form form" action="#" method="POST"
+        @submit.prevent="order">
         <div class="cart__field">
           <div class="cart__data">
             <BaseFormText v-model="formData.name" :error="formError.name"
@@ -43,8 +44,8 @@
             <BaseFormText v-model="formData.email" type="email" :error="formError.email"
               title="E-mail" placeholder="Введите ваш e-mail"/>
 
-            <BaseFormTextarea v-model="formData.comments" title="Комментарий к заказу"
-              :error="formError.comments" placeholder="Ваши пожелания"/>
+            <BaseFormTextarea v-model="formData.comment" title="Комментарий к заказу"
+              :error="formError.comment" placeholder="Ваши пожелания"/>
           </div>
 
           <div class="cart__options">
@@ -104,14 +105,17 @@
             </p>
           </div>
 
-          <button class="cart__button button button--primery" type="submit">
+          <button class="cart__button button button--primery" type="submit"
+            :disabled="cartItems.length === 0">
             Оформить заказ
           </button>
+          <div v-show="orderProcessing">Оформляем заказ...</div>
+          <div v-show="orderSent">Заказ оформлен</div>
         </div>
-        <div class="cart__error form__error-block">
+        <div class="cart__error form__error-block" v-if="formErrorMessage">
           <h4>Заявка не отправлена!</h4>
           <p>
-            Похоже произошла ошибка. Попробуйте отправить снова или перезагрузите страницу.
+            {{ formErrorMessage }}
           </p>
         </div>
       </form>
@@ -123,6 +127,8 @@
 import BaseFormText from '@/components/BaseFormText.vue';
 import BaseFormTextarea from '@/components/BaseFormTextarea.vue';
 import CartOrder from '@/components/CartOrder.vue';
+import API_BASE_URL from '@/config';
+import axios from 'axios';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -131,10 +137,40 @@ export default {
     return {
       formData: {},
       formError: {},
+      formErrorMessage: '',
+      orderProcessing: false,
+      orderSent: false,
     };
   },
   computed: {
     ...mapGetters({ cartItems: 'cartProductsDetail', totalPrice: 'cartTotalPrice' }),
+  },
+  methods: {
+    order() {
+      this.formError = {};
+      this.formErrorMessage = '';
+      this.orderProcessing = true;
+
+      axios
+        .post(`${API_BASE_URL}/api/orders`, {
+          ...this.formData,
+        }, {
+          params: {
+            userAccessKey: this.$store.state.userAccessKey,
+          },
+        })
+        .then(() => {
+          this.$store.commit('resetCart');
+          this.orderSent = true;
+        })
+        .catch((error) => {
+          this.formError = error.response.data.error.request || {};
+          this.formErrorMessage = error.response.data.error.message;
+        })
+        .then(() => {
+          this.orderProcessing = false;
+        });
+    },
   },
 };
 </script>
