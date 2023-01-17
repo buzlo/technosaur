@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import API_BASE_URL from '@/config';
+import countTotal from '@/helpers/countTotal';
 
 Vue.use(Vuex);
 
@@ -12,6 +13,7 @@ export default new Vuex.Store({
     cartProductsData: [],
     cartLoading: false,
     cartLoadingError: true,
+    orderInfo: null,
   },
   mutations: {
     updateCartProductQuantity(state, { productId, quantity }) {
@@ -30,6 +32,7 @@ export default new Vuex.Store({
     syncCartProducts(state) {
       state.cartProducts = state.cartProductsData.map((item) => ({
         productId: item.product.id,
+        price: item.price,
         quantity: item.quantity,
       }));
     },
@@ -42,6 +45,9 @@ export default new Vuex.Store({
     resetCart(state) {
       state.cartProducts = [];
       state.cartProductsData = [];
+    },
+    updateOrderInfo(state, orderInfo) {
+      state.orderInfo = orderInfo;
     },
   },
   getters: {
@@ -62,10 +68,8 @@ export default new Vuex.Store({
         },
       );
     },
-    cartTotalPrice(state, getters) {
-      return getters.cartProductsDetail.reduce((total, item) => (
-        item.product.price * item.quantity + total
-      ), 0);
+    cartTotalPrice(state) {
+      return countTotal(state.cartProducts);
     },
   },
   actions: {
@@ -141,6 +145,17 @@ export default new Vuex.Store({
         .then((response) => {
           context.commit('updateCartProductsData', response.data.items);
           context.commit('syncCartProducts');
+        });
+    },
+    loadOrderInfo(context, orderId) {
+      return axios
+        .get(`${API_BASE_URL}/api/orders/${orderId}`, {
+          params: {
+            userAccessKey: context.state.userAccessKey,
+          },
+        })
+        .then((response) => {
+          context.commit('updateOrderInfo', response.data);
         });
     },
   },
