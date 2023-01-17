@@ -53,10 +53,7 @@ export default {
   methods: {
     ...mapActions(['deleteProductFromCart']),
     deleteItem({ productId }) {
-      // eslint-disable-next-line no-alert
-      if (window.confirm('Удалить товар из корзины?')) {
-        this.deleteProductFromCart({ productId });
-      }
+      this.deleteProductFromCart({ productId });
     },
   },
 };
