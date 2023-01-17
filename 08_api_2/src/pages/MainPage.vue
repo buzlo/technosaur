@@ -99,7 +99,7 @@ export default {
           .then((response) => { this.productsData = response.data; })
           .catch(() => { this.productsLoadingError = true; })
           .then(() => { this.productsLoading = false; });
-      }, 2000);
+      }, 0);
     },
   },
   watch: {
